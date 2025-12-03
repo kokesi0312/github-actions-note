@@ -603,14 +603,23 @@ jobs:
 
           let browser, context, page;
           try{
-            browser = await chromium.launch({ headless: true, args: ['--lang=ja-JP'] });
-            context = await browser.newContext({ storageState: STATE_PATH, locale: 'ja-JP' });
-            page = await context.newPage();
-            page.setDefaultTimeout(180000);
-
-            await page.goto(START_URL, { waitUntil: 'domcontentloaded' });
-            await page.waitForSelector('textarea[placeholder*="記事タイトル"]');
-            await page.fill('textarea[placeholder*="記事タイトル"]', TITLE);
+              browser = await chromium.launch({ headless: true, args: ['--lang=ja-JP'] });
+              context = await browser.newContext({ storageState: STATE_PATH, locale: 'ja-JP' });
+              page = await context.newPage();
+              page.setDefaultTimeout(180000);
+          
+              await page.goto(START_URL, { waitUntil: 'domcontentloaded' });
+              
+              // 💡 待機処理を強化
+              // ネットワークが落ち着くのを待つ
+              await page.waitForLoadState('networkidle'); 
+              
+              // 💡 【修正】存在するボタンのテキストに合わせて修正
+              await page.waitForSelector('button:has-text("公開に進む")'); 
+              
+              // 💡 タイトル要素のセレクターを完全一致に修正
+              await page.waitForSelector('textarea[placeholder="記事タイトル"]');
+              await page.fill('textarea[placeholder="記事タイトル"]', TITLE);
 
             const bodyBox = page.locator('div[contenteditable="true"][role="textbox"]').first();
             await bodyBox.waitFor({ state: 'visible' });
