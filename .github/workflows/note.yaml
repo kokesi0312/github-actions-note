@@ -65,11 +65,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install Claude Code SDK
+          cache: 'npm' # <-- ここを追加
+          
+      - name: Install Claude Code (Library Mode) 💡 修正
         run: |
           npm init -y
-          npm i @anthropic-ai/claude-code
+          # パッケージをインストールし、package.jsonに書き込む
+          npm install @anthropic-ai/claude-code --save
 
       - name: Research with Claude Code SDK
         run: |
