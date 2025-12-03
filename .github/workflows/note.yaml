@@ -615,7 +615,7 @@ jobs:
               await page.waitForLoadState('networkidle'); 
               
               // 💡 【修正】存在するボタンのテキストに合わせて修正
-              await page.waitForSelector('button:has-text("公開に進む")'); 
+              await page.waitForSelector('text="公開に進む"');
               
               // 💡 タイトル要素のセレクターを完全一致に修正
               await page.waitForSelector('textarea[placeholder="記事タイトル"]');
