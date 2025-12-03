@@ -68,8 +68,9 @@ jobs:
 
       - name: Install Claude Code SDK
         run: |
-          npm init -y
-          npm i @anthropic-ai/claude-code
+          npm install
+          # 2. research.mjs で必要なモジュールを --save で追加インストールします
+          npm install @anthropic-ai/claude-code --save
 
       - name: Research with Claude Code SDK
         run: |
