@@ -65,18 +65,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm' # <-- ここを追加
-          
-      - name: Install Claude Code (Library Mode) 💡 修正
+
+      - name: Install Claude Code SDK
         run: |
           npm init -y
-          # パッケージをインストールし、package.jsonに書き込む
-          npm install @anthropic-ai/claude-code --save
+          npm i @anthropic-ai/claude-code
 
       - name: Research with Claude Code SDK
         run: |
-          import { Anthropic } from '@anthropic-ai/sdk'; // <-- これに変更し、
-          const claude = new Anthropic();
+          cat > research.mjs <<'EOF'
+          import { query } from '@anthropic-ai/claude-code';
           import fs from 'fs';
           const theme = process.env.THEME || '';
           const target = process.env.TARGET || '';
@@ -91,7 +89,7 @@ jobs:
           ].join('\n');
           const userPrompt = `以下のテーマとターゲットに対する最終版のリサーチレポートを作成してください。\n【重要】途中経過や確認質問は一切せず、最終レポートのみを返してください。不明点がある場合は「前提と仮定」セクションで簡潔に仮定を明記してから続行してください。事実ベースで一次情報を最優先し、本文にMarkdownリンクで出典を埋め込んでください。\n---\nテーマ: ${theme}\nターゲット: ${target}\n現在日付: ${today}`;
           const messages = [];
-          for await (const msg of Anthropic({
+          for await (const msg of query({
             prompt: userPrompt,
             options: {
               customSystemPrompt: sys,
@@ -285,17 +283,17 @@ jobs:
           async function tavilySearch(q){
             const res = await fetch('https://api.tavily.com/search', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ api_key: TAVILY_API_KEY, Anthropic: q, search_depth: 'advanced', max_results: 5, include_answer: true })
+              body: JSON.stringify({ api_key: TAVILY_API_KEY, query: q, search_depth: 'advanced', max_results: 5, include_answer: true })
             });
-            if(!res.ok){ return { Anthropic:q, results:[], answer:null }; }
+            if(!res.ok){ return { query:q, results:[], answer:null }; }
             const json = await res.json().catch(()=>({}));
-            return { Anthropic:q, results: Array.isArray(json.results)? json.results: [], answer: json.answer || null };
+            return { query:q, results: Array.isArray(json.results)? json.results: [], answer: json.answer || null };
           }
 
           function formatEvidence(items){
             const lines = [];
             for(const it of items){
-              lines.push(`### 検索: ${it.Anthropic}`);
+              lines.push(`### 検索: ${it.query}`);
               if(it.answer){ lines.push(`要約: ${it.answer}`); }
               for(const r of it.results||[]){
                 const t = (r.title||'').toString();
@@ -686,4 +684,3 @@ jobs:
         with:
           name: note-screenshot
           path: ${{ steps.publish.outputs.screenshot }}
-
