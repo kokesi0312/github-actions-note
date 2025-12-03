@@ -75,7 +75,7 @@ jobs:
           # 2. 💡 安定した公式SDKを追加インストール
           npm install @anthropic-ai/sdk --save
 
-      - name: Research with Anthropic SDK
+      - name: Research with Anthropic SDK (Final Code)
         run: |
           cat > research.mjs <<'EOF'
           import Anthropic from '@anthropic-ai/sdk';
@@ -88,7 +88,7 @@ jobs:
           
           fs.mkdirSync(artifactsDir, { recursive: true });
           
-          # 💡 モデル名をシンプルなエイリアス 'claude-3-5-sonnet' に修正
+          // モデル名をシンプルなエイリアス 'claude-3-5-sonnet' に修正
           const modelName = 'claude-3-5-sonnet'; 
           const maxTokens = 4000;
           
@@ -122,7 +122,7 @@ jobs:
           fs.writeFileSync(`${artifactsDir}/research.md`, assistantTexts || '');
           EOF
           node research.mjs
-
+          
       - name: Collect research
         id: collect
         run: |
