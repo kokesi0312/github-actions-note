@@ -88,14 +88,14 @@ jobs:
           
           fs.mkdirSync(artifactsDir, { recursive: true });
           
-          // 💡 モデルを最新の推奨モデルに変更
-          const modelName = 'claude-3-5-sonnet'; 
+          // 💡 モデル名を API で認識される正確な文字列に修正
+          const modelName = 'claude-3-5-sonnet-20240620'; 
           const maxTokens = 4000;
           
           const sys = [
               'あなたは最新情報の収集と要約に特化した超一流のリサーチャーです。',
               '事実ベース・一次情報優先・本文内にMarkdownリンクで出典を埋め込むこと。',
-              '十分な分量（目安: 2,000語以上）。各節で出典を本文に埋め込む。',
+              '十分な分量（目安: 2,000語以上）。各節で出典を本文に埋め込むこと。',
               'WebSearch と WebFetch を必ず使用し、一次情報（公的機関・規格・論文・公式）を優先する。',
           ].join('\n');
           
@@ -111,8 +111,7 @@ jobs:
               messages: [
                   { role: 'user', content: userPrompt }
               ],
-              // 💡 ツールの定義を削除 (モデルがプロンプトに基づいて自動的に検索機能を使用するため)
-              // tools: [...] や tool_choice: { type: "auto" } は不要です。
+              // WebSearch/WebFetch はプロンプト指示により自動的に使用されます
           });
 
           for await (const chunk of stream) {
