@@ -88,8 +88,8 @@ jobs:
           
           fs.mkdirSync(artifactsDir, { recursive: true });
           
-          // 💡 モデル名を API で認識される正確な文字列に修正
-          const modelName = 'claude-3-5-sonnet-20240620'; 
+          # 💡 モデル名をシンプルなエイリアス 'claude-3-5-sonnet' に修正
+          const modelName = 'claude-3-5-sonnet'; 
           const maxTokens = 4000;
           
           const sys = [
@@ -111,7 +111,6 @@ jobs:
               messages: [
                   { role: 'user', content: userPrompt }
               ],
-              // WebSearch/WebFetch はプロンプト指示により自動的に使用されます
           });
 
           for await (const chunk of stream) {
