@@ -718,40 +718,40 @@ jobs:
 
 
   convert_to_markdown:
-      # 💡 [重要] ここを final.json を出力しているジョブ名に置き換えてください
-      needs: [post] 
-      runs-on: ubuntu-latest
+    # 💡 依存関係を設定: 'post' ジョブが成功した後に実行
+    needs: post 
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
       
-      steps:
-        - name: Checkout Code
-          uses: actions/checkout@v4
-        
-        # 1. 成果物ダウンロード (JSONファイルの取得)
-        - name: Download Final JSON Artifact
-          uses: actions/download-artifact@v4
-          with:
-            name: final-artifact # JSONを出力したジョブの成果物名
-            path: .note-artifacts 
-            
-        - name: Set up Node.js
-          uses: actions/setup-node@v4
-          with:
-            node-version: '20'
-            
-        # 2. 変換スクリプトの実行
-        - name: Execute Conversion Script
-          # ルートディレクトリに配置した convert.mjs を実行
-          run: node convert.mjs 
-  
-        # 3. 変換後の成果物アップロード (Markdownとタグ)
-        - name: Upload Final Post Artifacts
-          uses: actions/upload-artifact@v4
-          with:
-            name: note-post-ready
-            path: .note-artifacts/final_post.md
-            
-        - name: Upload Final Tags Artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: note-tags-ready
-            path: .note-artifacts/final_tags.txt
+      # 1. 成果物ダウンロード (JSONファイルの取得)
+      - name: Download Final JSON Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: final-artifact # JSONを出力したジョブの成果物名
+          path: .note-artifacts 
+          
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      # 2. 変換スクリプトの実行
+      - name: Execute Conversion Script
+        # ルートディレクトリに配置した convert.mjs を実行
+        run: node convert.mjs 
+
+      # 3. 変換後の成果物アップロード (Markdownとタグ)
+      - name: Upload Final Post Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: note-post-ready
+          path: .note-artifacts/final_post.md
+          
+      - name: Upload Final Tags Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: note-tags-ready
+          path: .note-artifacts/final_tags.txt
