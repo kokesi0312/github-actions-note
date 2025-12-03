@@ -48,6 +48,22 @@ env:
   TZ: Asia/Tokyo
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Node.js v20.19.6を使っているので、'20'を指定します。
+
+      # ★★★ このステップが重要です！これを research.mjs の実行前に必ず追加してください ★★★
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Run research script
+        # ここで research.mjs が実行されているはずです
+        run: node research.mjs
+        # もしくは記事の通り Run cat > research.mjs <<'EOF' ... node research.mjs となっているかもしれません
   research:
     name: Research (CCSDK WebSearch/WebFetch)
     runs-on: ubuntu-latest
