@@ -75,10 +75,9 @@ jobs:
           # 2. 💡 安定した公式SDKを追加インストール
           npm install @anthropic-ai/sdk --save
 
-      - name: Research with Anthropic SDK 💡 コード修正
+      - name: Research with Anthropic SDK
         run: |
           cat > research.mjs <<'EOF'
-          // 💡 @anthropic-ai/sdk をインポート
           import Anthropic from '@anthropic-ai/sdk';
           import fs from 'fs';
           
@@ -89,19 +88,19 @@ jobs:
           
           fs.mkdirSync(artifactsDir, { recursive: true });
           
-          const modelName = 'claude-3-opus-20240229'; // Web検索が有効なモデルを選択
+          // 💡 モデルを最新の推奨モデルに変更
+          const modelName = 'claude-3-5-sonnet'; 
           const maxTokens = 4000;
+          
           const sys = [
               'あなたは最新情報の収集と要約に特化した超一流のリサーチャーです。',
               '事実ベース・一次情報優先・本文内にMarkdownリンクで出典を埋め込むこと。',
               '十分な分量（目安: 2,000語以上）。各節で出典を本文に埋め込む。',
-              // 💡 ツール使用の指示はシステムプロンプトではなく、APIのtools引数に移す
               'WebSearch と WebFetch を必ず使用し、一次情報（公的機関・規格・論文・公式）を優先する。',
           ].join('\n');
           
           const userPrompt = `以下のテーマとターゲットに対する最終版のリサーチレポートを作成してください。\n【重要】途中経過や確認質問は一切せず、最終レポートのみを返してください。不明点がある場合は「前提と仮定」セクションで簡潔に仮定を明記してから続行してください。事実ベースで一次情報を最優先し、本文にMarkdownリンクで出典を埋め込んでください。\n---\nテーマ: ${theme}\nターゲット: ${target}\n現在日付: ${today}`;
           
-          // 💡 SDKクライアントの初期化
           const claude = new Anthropic();
           
           let assistantTexts = '';
@@ -112,28 +111,17 @@ jobs:
               messages: [
                   { role: 'user', content: userPrompt }
               ],
-              // 💡 WebSearch/WebFetch のツールを明示的に定義（SDK形式）
-              tools: [
-                  { name: "WebSearch", description: "インターネットから最新情報を検索します。" },
-                  { name: "WebFetch", description: "特定のURLから内容を取得します。" }
-              ],
-              // 💡 ツール使用を許可する設定を追加（SDK形式）
-              tool_choice: { type: "auto" } 
+              // 💡 ツールの定義を削除 (モデルがプロンプトに基づいて自動的に検索機能を使用するため)
+              // tools: [...] や tool_choice: { type: "auto" } は不要です。
           });
 
-          // 💡 ストリームを処理し、最終テキストを収集
           for await (const chunk of stream) {
-              // content_block_delta（テキスト応答）のみを収集
               if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
                   assistantTexts += chunk.delta.text;
               }
-              // ツール使用の応答はここでは特に処理しない（Claudeが自動で実行してくれるため）
           }
           
           fs.writeFileSync(`${artifactsDir}/research.md`, assistantTexts || '');
-          // トレース情報はSDK形式では複雑になるため、ここでは省略します
-          // try { fs.writeFileSync(`${artifactsDir}/research_trace.json`, JSON.stringify(messages, null, 2)); } catch {}
-
           EOF
           node research.mjs
 
