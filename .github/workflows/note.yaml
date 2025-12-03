@@ -75,7 +75,7 @@ jobs:
           # 2. 💡 安定した公式SDKを追加インストール
           npm install @anthropic-ai/sdk --save
 
-      - name: Research with Anthropic SDK (Final Model Fallback)
+      - name: Research with Anthropic SDK (Final Model Fallback to Sonnet)
         run: |
           cat > research.mjs <<'EOF'
           import Anthropic from '@anthropic-ai/sdk';
@@ -88,8 +88,8 @@ jobs:
           
           fs.mkdirSync(artifactsDir, { recursive: true });
           
-          // 💡 安定版の Claude 3 Opus にフォールバック
-          const modelName = 'claude-3-opus-20240229'; 
+          // 💡 互換性の高い Claude 3 Sonnet に切り替え
+          const modelName = 'claude-3-sonnet-20240229'; 
           const maxTokens = 4000;
           
           const sys = [
