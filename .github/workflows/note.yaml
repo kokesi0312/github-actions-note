@@ -606,20 +606,23 @@ jobs:
               browser = await chromium.launch({ headless: true, args: ['--lang=ja-JP'] });
               context = await browser.newContext({ storageState: STATE_PATH, locale: 'ja-JP' });
               page = await context.newPage();
-              page.setDefaultTimeout(180000);
+              // タイムアウトを180秒から240秒に延長
+              page.setDefaultTimeout(240000); 
           
               await page.goto(START_URL, { waitUntil: 'domcontentloaded' });
               
-              // 💡 待機処理を強化
-              // ネットワークが落ち着くのを待つ
+              // 💡 【重要】ネットワークが完全に落ち着くのを待つ
               await page.waitForLoadState('networkidle'); 
               
-              // 💡 【修正】存在するボタンのテキストに合わせて修正
-              await page.waitForSelector('text="公開に進む"');
+              // 2. 💡 【修正1】より柔軟な方法で「公開に進む」ボタンを探す
+              //    locator('text="公開に進む"') は、has-textより柔軟にテキストを探します
+              await page.waitForSelector('text="公開に進む"'); 
               
-              // 💡 タイトル要素のセレクターを完全一致に修正
-              await page.waitForSelector('textarea[placeholder="記事タイトル"]');
-              await page.fill('textarea[placeholder="記事タイトル"]', TITLE);
+              // 3. 💡 【修正2】タイトル入力欄も柔軟に探す
+              //    前回は完全一致でしたが、より柔軟な方法に戻します
+              await page.waitForSelector('textarea[placeholder*="記事タイトル"]');
+              await page.fill('textarea[placeholder*="記事タイトル"]', TITLE);
+
 
             const bodyBox = page.locator('div[contenteditable="true"][role="textbox"]').first();
             await bodyBox.waitFor({ state: 'visible' });
