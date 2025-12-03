@@ -66,6 +66,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install Node Modules
+        run: npm install
+
       - name: Install Claude Code SDK
         run: |
           npm init -y
